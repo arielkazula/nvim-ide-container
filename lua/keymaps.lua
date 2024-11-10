@@ -51,3 +51,42 @@ function TinyCodeAction()
 end
 map("n", "<leader>cp", ":lua TinyCodeAction()<CR>", opts)
 
+function LiveGrepInParentDir()
+	local buf_dir = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":p:h")
+	local parent_dir = vim.fn.fnamemodify(buf_dir, ":h")
+
+	if parent_dir ~= "" then
+		require("telescope.builtin").live_grep({
+			search_dirs = { parent_dir }, -- Set the search directory to the parent folder of the current buffer
+		})
+	else
+		print("No valid parent directory detected for the current buffer")
+	end
+end
+map("n", "<leader>fip", ":lua LiveGrepInParentDir()<CR>", opts)
+
+function LiveGrepInDir()
+	local buf_dir = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":p:h")
+	require("telescope.builtin").live_grep({
+		search_dirs = { buf_dir }, -- Set the search directory to the parent folder of the current buffer
+	})
+end
+
+map("n", "<leader>fid", ":lua LiveGrepInDir()<CR>", opts)
+
+-- Function to copy the current file path and line number
+function CopyFilePathAndLine()
+	local filepath = vim.fn.expand("%")
+	local line_number = vim.fn.line(".")
+	local result = filepath .. ":" .. line_number
+
+	-- Copy to system clipboard
+	vim.fn.setreg("+", result)
+
+	-- Notify the user
+	print("Copied: " .. result)
+end
+
+map("n", "<leader>cc", ":lua CopyFilePathAndLine()<CR>", opts)
+
+
