@@ -44,3 +44,10 @@ function TodoInParentDir()
         })
 end
 map("n", "<leader>tp", ":lua TodoInParentDir()<CR>", opts)
+
+
+function TinyCodeAction()
+        require("tiny-code-action").code_action()
+end
+map("n", "<leader>cp", ":lua TinyCodeAction()<CR>", opts)
+
