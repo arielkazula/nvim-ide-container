@@ -45,6 +45,7 @@ return {
                 },
         },
 
+        { "nvim-treesitter/playground" },
         -- Telescope for fuzzy searching
         { "nvim-telescope/telescope.nvim", dependencies = { "nvim-lua/plenary.nvim" } },
 
@@ -104,7 +105,7 @@ return {
                         require("onedark").setup({
                                 -- Main options --
                                 style = "dark", -- Default theme style. Choose between 'dark', 'darker', 'cool', 'deep', 'warm', 'warmer' and 'light'
-                                transparent = false, -- Show/hide background
+                                transparent = true, -- Show/hide background
                                 term_colors = true, -- Change terminal color as per the selected theme style
                                 ending_tildes = false, -- Show the end-of-buffer tildes. By default they are hidden
                                 cmp_itemkind_reverse = false, -- reverse item kind highlights in cmp menu
@@ -131,13 +132,17 @@ return {
 
                                 -- Custom Highlights --
                                 colors = {}, -- Override default colors
-                                highlights = {}, -- Override highlight groups
+                                highlights = {
+                                        -- Tree-sitter specific highlight groups
+                                        --["@comment"] = { fg = "#228B22" }, -- Dark green for Tree-sitter comments
+                                        ["@comment.documentation"] = { fg = "#3cb371" }, -- Dark green for Tree-sitter documentation comments
+                                }, -- Override highlight groups
 
                                 -- Plugins Config --
                                 diagnostics = {
                                         darker = true, -- darker colors for diagnostic
                                         undercurl = true, -- use undercurl instead of underline for diagnostics
-                                        background = true, -- use background color for virtual text
+                                        background = false, -- use background color for virtual text
                                 },
                         })
                 end,
@@ -184,7 +189,7 @@ return {
                 event = "VimEnter",
                 opts = function(_, opts)
                         local logo = [[
-                 _______     _                  _________ ______   _______
+             _______     _                  _________ ______   _______
             (  ___  )   | \    /\           \__   __/(  __  \ (  ____ \
             | (   ) |   |  \  / /              ) (   | (  \  )| (    \/
             | (___) |   |  (_/ /    _____      | |   | |   ) || (__
@@ -342,7 +347,7 @@ return {
                         },
                 },
         },
-         {
+        {
                 "rachartier/tiny-code-action.nvim",
                 dependencies = {
                         { "nvim-lua/plenary.nvim" },
@@ -362,5 +367,4 @@ return {
                         })
                 end,
         },
-
 }
