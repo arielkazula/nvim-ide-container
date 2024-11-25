@@ -23,6 +23,12 @@ return {
                         "L3MON4D3/LuaSnip",
                         "saadparwaiz1/cmp_luasnip",
                 },
+                opts = function(_, opts)
+                    local cmp = require("cmp")
+                    opts.experimental = opts.experimental or {}
+                    opts.experimental.ghost_text = false -- Disable ghost text
+                    return opts
+                end,
         },
 
         { "nvim-treesitter/nvim-treesitter", build = ":TSUpdate" },
