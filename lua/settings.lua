@@ -12,3 +12,9 @@ vim.o.colorcolumn = "80"
 vim.o.guicursor = "n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20"
 vim.cmd("colorscheme onedark")
 vim.opt.termguicolors = true
+vim.diagnostic.config({
+        virtual_text = false,
+        underline = false,
+        signs = true,
+        severity_sort = true,
+})
