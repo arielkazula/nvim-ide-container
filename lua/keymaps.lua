@@ -85,5 +85,21 @@ wk.add({
 		"<leader>cc",
 		":lua CopyFilePathAndLine()<CR>",
 		desc = "Copy File Path and Line",
+	}, -- Subgroup for Find -> Document
+	-- Subgroup for Find -> Workspace
+	{ "<leader>fw", group = "Workspace" },
+	{
+		"<leader>fws",
+		function()
+			require("fzf-lua").lsp_workspace_symbols()
+		end,
+		desc = "Workspace Symbols (FZF)",
+	},
+	{
+		"<leader>fwd",
+		function()
+			require("fzf-lua").diagnostics_workspace()
+		end,
+		desc = "Workspace Diagnostics (FZF)",
 	},
 })
