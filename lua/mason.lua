@@ -14,81 +14,6 @@ require("mason-lspconfig").setup({
         },
         automatic_installation = true, -- Automatically install any LSP that is configured
 })
-require("mason-lspconfig").setup({
-        handlers = {
-                function(server_name)
-                        -- LSP servers and clients are able to communicate to each other what features they support.
-                        --  By default, Neovim doesn't support everything that is in the LSP specification.
-                        --  When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
-                        --  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
-                        local capabilities = vim.lsp.protocol.make_client_capabilities()
-                        capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
-
-                        -- Enable the following language servers
-                        --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
-                        --
-                        --  Add any additional override configuration in the following tables. Available keys are:
-                        --  - cmd (table): Override the default command used to start the server
-                        --  - filetypes (table): Override the default list of associated filetypes for the server
-                        --  - capabilities (table): Override fields in capabilities. Can be used to disable certain LSP features.
-                        --  - settings (table): Override the default settings passed when initializing the server.
-                        --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
-                        local servers = {
-                                clangd = {
-                                        cmd = {
-                                                "clangd",
-                                                "--header-insertion=never",
-                                                "--all-scopes-completion",
-                                                "--background-index",
-                                                "--pch-storage=disk",
-                                                "--cross-file-rename",
-                                                "--log=info",
-                                                "--completion-style=detailed",
-                                                "--enable-config",
-                                                "--clang-tidy",
-                                                "--offset-encoding=utf-16",
-                                                "--fallback-style=llvm",
-                                                "--function-arg-placeholders",
-                                        },
-                                        on_init = function(client)
-                                                client.offset_encoding = "utf-8"
-                                        end,
-                                },
-                                harper_ls = {
-                                        settings = {
-                                                ["harper-ls"] = {
-                                                        linters = {
-                                                                spell_check = true,
-                                                                spelled_numbers = false,
-                                                                an_a = true,
-                                                                sentence_capitalization = false,
-                                                                unclosed_quotes = true,
-                                                                wrong_quotes = false,
-                                                                long_sentences = true,
-                                                                repeated_words = true,
-                                                                spaces = true,
-                                                                matcher = true,
-                                                                correct_number_suffix = true,
-                                                                number_suffix_capitalization = true,
-                                                                multiple_sequential_pronouns = true,
-                                                                linking_verbs = false,
-                                                                avoid_curses = true,
-                                                                terminating_conjunctions = true,
-                                                        },
-                                                },
-                                        },
-                                },
-                        }
-
-                        local server = servers[server_name] or {}
-                        -- This handles overriding only values explicitly passed
-                        -- by the server configuration above. Useful when disabling
-                        -- certain features of an LSP (for example, turning off formatting for tsserver)
-                        server.capabilities = vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {})
-                        require("lspconfig")[server_name].setup(server)
-                end,
-        },
-})
 
 -- Install formatters directly using Mason
 local mason_registry = require("mason-registry")
@@ -119,5 +44,110 @@ require("conform").setup({
         -- Configure auto-format on save
         format_on_save = {
                 lsp_fallback = true,
+        },
+})
+
+local lspconfig = require("lspconfig")
+local blink_cmp = require("blink.cmp")
+
+require("mason-lspconfig").setup_handlers({
+        function(server_name)
+                -- Default capabilities extended with blink.cmp
+                local capabilities = blink_cmp.get_lsp_capabilities()
+
+                -- Define the on_attach function
+                local on_attach = function(client, bufnr)
+                        -- Helper function to set buffer-local keymaps
+                        local buf_map = function(mode, lhs, rhs, desc)
+                                vim.api.nvim_buf_set_keymap(bufnr, mode, lhs, rhs, { noremap = true, silent = true, desc = desc })
+                        end
+
+                        -- Set LSP keymaps
+                        buf_map("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", "Go to Definition")
+                        buf_map("n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", "References")
+                        buf_map("n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", "Hover Documentation")
+                        buf_map("n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", "Rename Symbol")
+                        buf_map("n", "<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>", "Code Action")
+                        buf_map("n", "[d", "<cmd>lua vim.diagnostic.goto_prev()<CR>", "Previous Diagnostic")
+                        buf_map("n", "]d", "<cmd>lua vim.diagnostic.goto_next()<CR>", "Next Diagnostic")
+
+                        -- Configure diagnostics for this buffer
+                        vim.diagnostic.config({
+                                virtual_text = false, -- Disable virtual text
+                                signs = true, -- Enable signs
+                                underline = false, -- Enable underlines for diagnostics
+                                update_in_insert = false, -- Only update diagnostics in Normal mode
+                        }, bufnr)
+                end
+
+                -- Default configuration shared across servers
+                local default_opts = {
+                        capabilities = capabilities,
+                        on_attach = on_attach, -- Attach the buffer-specific setup
+                }
+                -- Server-specific configurations
+                local server_specific_opts = {
+                        clangd = {
+                                cmd = {
+                                        "clangd",
+                                        "--header-insertion=never",
+                                        "--all-scopes-completion",
+                                        "--background-index",
+                                        "--pch-storage=disk",
+                                        "--cross-file-rename",
+                                        "--log=info",
+                                        "--completion-style=detailed",
+                                        "--enable-config",
+                                        "--clang-tidy",
+                                        "--offset-encoding=utf-16",
+                                        "--fallback-style=llvm",
+                                        "--function-arg-placeholders",
+                                },
+                                on_init = function(client)
+                                        client.offset_encoding = "utf-8"
+                                end,
+                        },
+                        harper_ls = {
+                                settings = {
+                                        ["harper-ls"] = {
+                                                linters = {
+                                                        spell_check = true,
+                                                        spelled_numbers = false,
+                                                        an_a = true,
+                                                        sentence_capitalization = false,
+                                                        unclosed_quotes = true,
+                                                        wrong_quotes = false,
+                                                        long_sentences = true,
+                                                        repeated_words = true,
+                                                        spaces = true,
+                                                        matcher = true,
+                                                        correct_number_suffix = true,
+                                                        number_suffix_capitalization = true,
+                                                        multiple_sequential_pronouns = true,
+                                                        linking_verbs = false,
+                                                        avoid_curses = true,
+                                                        terminating_conjunctions = true,
+                                                },
+                                        },
+                                },
+                        },
+                }
+
+                -- Merge default and server-specific options
+                local opts = vim.tbl_deep_extend("force", default_opts, server_specific_opts[server_name] or {})
+                -- Setup the server
+                lspconfig[server_name].setup(opts) -- Merge specific options if they exist
+        end,
+})
+
+require("blink.cmp").setup({
+        formatters = {
+                ensure_installed = { "clang-format", "jq", "black", "codespell" },
+                setup = {
+                        cpp = { "clang-format" },
+                        json = { "jq" },
+                        python = { "black", "isort" },
+                },
+                format_on_save = true,
         },
 })
