@@ -412,5 +412,60 @@ return {
 			{ "}", "<cmd>AerialNext<CR>", desc = "Next Symbol" },
 			{ "<leader>a", "<cmd>AerialToggle!<CR>", desc = "Toggle Aerial" },
 		},
+	}, -- Disable Neo-tree
+	{
+		"nvim-neo-tree/neo-tree.nvim",
+		enabled = false, -- Disable Neo-tree
+	},
+
+	-- Add Oil.nvim with better which-key integration
+	{
+		"stevearc/oil.nvim",
+		config = function()
+			require("oil").setup({
+				default_file_explorer = true, -- Use Oil as the default file explorer
+				view_options = {
+					show_hidden = true, -- Show hidden files
+				},
+				skip_confirm_for_simple_edits = true,
+				git = {
+					-- Return true to automatically git add/mv/rm files
+					add = function(path)
+						return false
+					end,
+					mv = function(src_path, dest_path)
+						return true
+					end,
+					rm = function(path)
+						return false
+					end,
+				},
+				float = {
+					padding = 2,
+					max_width = 100,
+					max_height = 30,
+					border = "rounded",
+					win_options = {
+						winblend = 10,
+					},
+				},
+				keymaps = {
+					["q"] = "actions.close", -- Close with 'q'
+					["<leader>e"] = "actions.close", -- Allow Ctrl-e to close
+				},
+			})
+		end,
+		-- Optional dependencies
+		dependencies = { { "echasnovski/mini.icons", opts = {} } },
+		-- Add to which-key for better integration
+		keys = {
+			{
+				"<leader>e",
+				function()
+					require("oil").open_float()
+				end,
+				desc = "Open Oil File Explorer",
+			},
+		},
 	},
 }
