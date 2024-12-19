@@ -11,6 +11,8 @@ require("mason-lspconfig").setup({
 		"cmake", -- cmake
 		"lua_ls", -- Lua (if you use Lua in config)
 		"harper_ls",
+		"marksman",
+		"jsonls",
 	},
 	automatic_installation = true, -- Automatically install any LSP that is configured
 })
