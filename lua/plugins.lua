@@ -372,15 +372,6 @@ return {
 					enabled = false, -- Ensure ghost text is explicitly disabled
 				},
 			},
-			windows = {
-				ghost_text = {
-					enabled = false, -- Double-check disabling in windows settings
-				},
-			},
-
-			diagnostics = {
-				display_virtual_text = false, -- Disable virtual text
-			},
 		},
 		-- allows extending the providers array elsewhere in your config
 		-- without having to redefine it
