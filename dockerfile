@@ -136,6 +136,10 @@ RUN wget https://luarocks.org/releases/luarocks-3.9.1.tar.gz && \
     cd .. && \
     rm -rf luarocks-3.9.1 luarocks-3.9.1.tar.gz
 
+# Copy the .Xauthority file from the host to the container (optional)
+# You can also generate this dynamically later if required
+COPY --chown=$USERNAME:$USERNAME ./.Xauthority /home/$USERNAME/.Xauthority
+
 # Install lazygit
 RUN LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*') && \
     curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz" && \
@@ -150,6 +154,7 @@ RUN LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygi
 
 USER $USERNAME
 WORKDIR ${WORKDIR}
+
 
 # Install LazyVim and sync it without overwriting any personal configuration
 RUN git clone https://github.com/LazyVim/starter ${NVIM_CONFIG_DIR}
@@ -174,9 +179,6 @@ RUN python3 -m pip install --break-system-packages pynvim neovim
 
 RUN nvim --headless "+Lazy! sync" +qa
 
-# Copy the .Xauthority file from the host to the container (optional)
-# You can also generate this dynamically later if required
-COPY --chown=$USERNAME:$USERNAME ./.Xauthority /home/$USERNAME/.Xauthority
 
 # Set ownership of the ~/.config/nvim directory to your user
 RUN chown -R ${USERNAME}:${USERNAME} ${NVIM_CONFIG_DIR} ${NVIM_DATA_DIR}
