@@ -70,14 +70,12 @@ require("mason-lspconfig").setup_handlers({
 					"--all-scopes-completion",
 					"--background-index",
 					"--pch-storage=disk",
-					"--cross-file-rename",
 					"--log=info",
 					"--completion-style=detailed",
 					"--enable-config",
 					"--clang-tidy",
 					"--offset-encoding=utf-16",
 					"--fallback-style=llvm",
-					"--function-arg-placeholders",
 				},
 				on_init = function(client)
 					client.offset_encoding = "utf-8"
