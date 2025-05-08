@@ -9,6 +9,22 @@ local blink_cmp = require("blink.cmp")
 -- Shared capabilities
 local capabilities = blink_cmp.get_lsp_capabilities()
 
+vim.lsp.config("clangd", {
+        cmd = {
+                "clangd",
+                "--header-insertion=never",
+                "--all-scopes-completion",
+                "--background-index",
+                "--pch-storage=disk",
+                "--log=info",
+                "--completion-style=detailed",
+                "--enable-config",
+                "--clang-tidy",
+                "--offset-encoding=utf-16",
+                "--fallback-style=llvm",
+        },
+})
+
 -- 2. Per-server overrides
 local server_specific_opts = {
   clangd = {
